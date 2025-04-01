@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body class="bg-gray-100">
+    <%- include('../partials/nav') %>
+        <main class="max-w-md mx-auto p-4 bg-white shadow-md rounded mt-10">
+            <h1 class="text-2xl font-bold text-center mb-6">Modifier la recette</h1>
+            <form action="/recettes/detail/<%= recipe._id %>?_method=PUT" method="post" class="space-y-4">
+                <div>
+                    <label for="recipeName" class="block text-gray-700 font-medium mb-2">Nom de la recette</label>
+                    <input type="text" id="recipeName" name="recipeName" value="<%= recipe.name %>"
+                        class="w-full border border-gray-300 rounded p-2" required>
+                </div>
+                <div>
+                    <label for="recipeDescription" class="block text-gray-700 font-medium mb-2">Description</label>
+                    <textarea id="recipeDescription" name="recipeDescription" rows="4"
+                        class="w-full border border-gray-300 rounded p-2" required><%= recipe.description %></textarea>
+                </div>
+                <div class="flex justify-between">
+                    <button type="submit"
+                        class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        Enregistrer les modifications
+                    </button>
+                    <a href="/recettes" class="text-blue-500 hover:text-blue-700 self-center">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+
+            <!-- formulaire pour ajouter une liste d'ingrédients à la recette -->
+            <h1 class="text-2xl font-bold text-center mb-6 mt-4">Ajouter des items</h1>
+            <form action="/recettes/detail/<%= recipe._id %>/item" method="post" class="space-y-4 flex flex-col">
+                <div>
+                    <label for="recipeItems" class="block font-medium text-gray-700">Items</label>
+                    <select name="recipeItems" id="recipeItems" class="w-full border border-gray-300 rounded p-2">
+                        <% items.forEach(item=> { %>
+                            <option value="<%= item._id %>">
+                                <%= item.name %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+                <div>
+                    <label for="quantity" class="block font-medium text-gray-700">Quantité</label>
+                    <input type="number" name="quantity" id="quantity"
+                        class="w-full border border-gray-300 rounded p-2 mb-4" min="0" value="1" />
+                </div>
+                <button type="submit"
+                    class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full">Ajouter</button>
+            </form>
+
+            <!-- afficher la liste des items de la recette -->
+            <h1 class="text-2xl font-bold text-center mb-6 mt-4">Items de la recette</h1>
+            <ul class="space-y-4">
+                <% recipeItems.forEach(item=> { %>
+                    <li class="border border-gray-300 p-4 rounded flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-bold">
+                                <%= item.item.name %>
+                            </h2>
+                            <p class="text-sm text-gray-600">
+                                Quantité : <%= item.recipeQuantity %>
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <!-- Bouton décrémenter -->
+                            <form action="/recettes/detail/<%= recipe._id %>/item/<%= item._id %>?_method=PUT"
+                                method="post">
+                                <input type="hidden" name="action" value="decrement">
+                                <button type="submit"
+                                    class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">
+                                    -
+                                </button>
+                            </form>
+                            <!-- Bouton incrémenter -->
+                            <form action="/recettes/detail/<%= recipe._id %>/item/<%= item._id %>?_method=PUT"
+                                method="post">
+                                <input type="hidden" name="action" value="increment">
+                                <button type="submit"
+                                    class="bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600">
+                                    +
+                                </button>
+                            </form>
+                            <!-- Bouton supprimer -->
+                            <form action="/recettes/detail/<%= recipe._id %>/item/<%= item._id %>?_method=DELETE"
+                                method="post">
+                                <button type="submit"
+                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                                    Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                    <% }) %>
+            </ul>
+            <hr class="my-4">
+            <form action="/recettes/detail/<%= recipe._id %>?_method=DELETE" method="post">
+                <button type="submit"
+                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                    Supprimer
+                </button>
+            </form>
+        </main>
+</body>
+
+</html>

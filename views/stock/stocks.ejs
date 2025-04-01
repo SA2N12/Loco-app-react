@@ -1,0 +1,59 @@
+<!-- filepath: c:\Users\lecor\OneDrive\Bureau\DOSSIERS\2 - Travail\3 - dev\2 - github\Loco-app\views\stock\stocks.ejs -->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Stocks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="bg-gray-100">
+    <%- include('../partials/nav') %>
+        <main class="container mx-auto px-4 py-8">
+            <h1 class="text-3xl font-bold mb-6">Liste des Stocks</h1>
+
+            <% if (errors && errors.length> 0) { %>
+                <div class="mb-4">
+                    <ul class="text-red-500">
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.msg %>
+                            </li>
+                            <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+  
+                    <% if (stocks && stocks.length> 0) { %>
+                        <% stocks.forEach(stock=> { %>
+                            <div class="bg-white p-4 rounded-lg shadow-md mb-4">
+                                <h2 class="text-xl font-semibold">
+                                    <%= stock.item.name %>
+                                </h2>
+                                <p>Quantité : <%= stock.quantity %>
+                                </p>
+                                <p><%= stock.user.username%></p>
+                                <!-- Formulaire de modification de la quantité -->
+                                <form action="/stocks/<%= stock._id %>?_method=PUT" method="post"
+                                    class="flex items-center space-x-2 my-2">
+                                    <input type="number" name="stockQuantity" value="<%= stock.quantity %>" min="0"
+                                        class="w-20 border rounded p-1">
+                                    <button type="submit"
+                                        class="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <% }); %>
+                                <% } else { %>
+                                    <p>Aucun stock trouvé.</p>
+                                    <% } %>
+        </main>
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Modifier la liste</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <%- include('../partials/nav') %>
+        <div class="p-4">
+            <a href="/listes" class="text-gray-800 hover:text-gray-900">&larr; Retour</a>
+        </div>
+        <main class="max-w-md mx-auto p-4 bg-white shadow-md rounded mt-10">
+
+            <h1 class="text-2xl font-bold text-center mb-6">Modifier la liste</h1>
+
+            <!-- Formulaire uniquement pour nom + description -->
+            <form action="/listes/<%= list._id %>?_method=PUT" method="post" class="space-y-4 flex flex-col">
+                <div>
+                    <label for="name" class="block mb-2 font-medium text-gray-700">Nom de la liste</label>
+                    <input type="text" id="name" name="listName" value="<%= list.name %>"
+                        class="w-full border border-gray-300 rounded p-2" />
+                </div>
+                <div>
+                    <label for="description" class="block mb-2 font-medium text-gray-700">Description</label>
+                    <textarea id="description" name="description" rows="4"
+                        class="w-full border border-gray-300 rounded p-2"><%= list.description || '' %></textarea>
+                </div>
+                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full">
+                    Enregistrer
+                </button>
+            </form>
+
+            <!-- Formulaire séparé pour ajouter un item -->
+            <form action="/listes/<%= list._id %>/item" method="post" class="mt-6 space-y-2">
+                <div class="mb-4">
+                    <label for="item-select" class="block text-gray-700 font-medium mb-2">Ajouter un item</label>
+                    <select name="itemId" id="item-select" class="w-full border border-gray-300 rounded p-2">
+                        <% items.forEach(item=> { %>
+                            <option value="<%= item._id %>">
+                                <%= item.name %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
+
+                <!-- Vous pouvez ajouter ici éventuellement un champ pour la quantité souhaitée -->
+                <div class="mb-4">
+                    <label for="itemQuantity" class="block text-gray-700 font-medium mb-2">Quantité</label>
+                    <input type="number" id="itemQuantity" name="itemQuantity" value="1" min="1"
+                        class="w-full border border-gray-300 rounded p-2">
+                </div>
+                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                    Ajouter
+                </button>
+                </div>
+            </form>
+
+            <!-- Formulaire pour ajouter une recette -->
+            <form action="/listes/<%= list._id %>/recette" method="post" class="space-y-4 mt-4">
+                <div>
+                    <label for="recipeId" class="block text-gray-700 font-medium mb-2">Ajouter une recette</label>
+                    <select name="recipeId" id="recipeId" class="w-full border border-gray-300 rounded p-2">
+                        <% recipes.forEach(recipe=> { %>
+                            <option value="<%= recipe._id %>">
+                                <%= recipe.name %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
+                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                    Ajouter
+                </button>
+            </form>
+
+            <!-- Liste des items (suppression séparée) -->
+            <div class="flex flex-col space-y-4 mt-8">
+                <% (list.items || []).forEach(item=> {
+                    const stockItem = stocks.find(s => s.item._id.toString() === item.item._id.toString());
+                    const stockQty = stockItem ? stockItem.quantity : 0;
+                    %>
+                    <div class="flex items-center justify-between bg-gray-100 p-2 rounded">
+                        <p>
+                            <%= item.item.name %>
+                                <div class="flex items-center space-x-2">
+                                    <!-- Bouton decrement -->
+                                    <form action="/listes/<%= list._id %>/item/<%= item._id %>?_method=PUT"
+                                        method="post">
+                                        <input type="hidden" name="action" value="decrement" />
+                                        <button type="submit" class="px-2 py-1 bg-gray-300 rounded text-xl">-</button>
+                                    </form>
+
+                                    <!-- Affichage de la quantité -->
+                                    <span class="px-2">
+                                        <%= item.listQuantity %>
+                                    </span>
+
+                                    <!-- Bouton increment -->
+                                    <form action="/listes/<%= list._id %>/item/<%= item._id %>?_method=PUT"
+                                        method="post">
+                                        <input type="hidden" name="action" value="increment" />
+                                        <button type="submit" class="px-2 py-1 bg-gray-300 rounded text-xl">+</button>
+                                    </form>
+
+                                    <span class="px-1 py-0.5 text-xs rounded"
+                                        style="background-color: <%= stockQty === 0 
+                                  ? '#ff5632' 
+                                  : ((stockQty > 0 && stockQty < item.listQuantity) ? '#FFA726' : '#8BC34A') %>; color: white;">
+                                        Stock restant : <%= stockQty %>
+                                    </span>
+                                </div>
+                        </p>
+                        <form action="/listes/<%= list._id %>/item/<%= item._id %>?_method=DELETE" method="post">
+                            <button type="submit" class="text-red-500 text-xs hover:text-red-700 px-2 py-1">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                    <% }); %>
+            </div>
+
+        </main>
+</body>
+
+</html>

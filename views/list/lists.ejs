@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body class="bg-gray-100">
+    <%- include('../partials/nav') %>
+
+        <main class="container mx-auto px-4 py-8">
+            <!-- ajouter une liste -->
+            <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Ajouter une Liste</h2>
+                <form action="/listes" method="post">
+                    <div class="mb-4">
+                        <label for="listName" class="block text-gray-700 font-medium mb-2">Nom de la Liste</label>
+                        <input type="text" id="listName" name="listName"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Entrez le nom de la liste">
+                    </div>
+                    <% if (errors.length> 0) { %>
+                        <div class="mb-4">
+                            <ul class="text-red-500">
+                                <% errors.forEach(error=> { %>
+                                    <li>
+                                        <%= error.msg%>
+                                    </li>
+                                    <% }) %>
+                            </ul>
+                        </div>
+                        <%} %>
+                            <button type="submit"
+                                class="w-full bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700 transition duration-300">
+                                Ajouter
+                            </button>
+                </form>
+            </div>
+            <!-- affiches les listes -->
+            <div class="mb-4">
+                <div class="flex flex-col space-y-4">
+                    <% lists.forEach(list=> { %>
+                        <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-xs mx-auto">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">
+                                <%= list.name %>
+                            </h3>
+                            <p>
+                                <%= list.description %>
+                            </p>
+                            <p><strong>longueur: <%= list.items.length %></strong></p>
+                            <% let totalPrice=0; list.items.forEach(li=> {
+                                totalPrice += (li.listQuantity || 1) * (li.item.price || 0);
+                                });
+                            %>
+                            <p><strong>Total : <%= totalPrice.toFixed(2) %>€</strong></p>
+                            <p><%= list.user.username%></p>
+                            <div class="flex justify-end space-x-2 mt-4">
+                                <form action="/listes/<%= list._id %>?_method=DELETE" method="post">
+                                    <button type="submit" class="p-2 hover:text-red-700">
+                                        <i class="fas fa-trash-alt text-black"></i>
+                                    </button>
+                                </form>
+                                <a href="/listes/<%= list._id %>" class="p-2 hover:text-blue-700">
+                                    <i class="fas fa-pencil-alt text-black"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+        </main>
+
+</body>
+
+</html>
